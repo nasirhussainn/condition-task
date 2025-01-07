@@ -1,5 +1,6 @@
 <script type="text/javascript">
     let parsed = false;
+
     RED.nodes.registerType('condition-task', {
         category: 'function',
         color: '#a6bbcf',
@@ -17,70 +18,61 @@
             return this.name || "condition-task";
         },
         oneditprepare: function () {
-            const conditionList = $("#node-input-conditions");
+        let conditions = this.conditions;
 
-            console.log("Before array typecasting : ", this.conditions, "Type: ", typeof this.conditions);
+        console.log("oneditprepare: Initial conditions:", conditions);
 
-            // Ensure conditions is always an array
-            let conditions = this.conditions;
-
-            console.log("oneditprepare: Initializing with conditions:", conditions, "Type: ", typeof conditions);
-
-            if (parsed === true) {
-                console.log("Conditions already parsed, skipping typecasting");
+        try {
+            // Attempt to parse conditions if they are a string
+            if (typeof conditions === "string") {
                 conditions = JSON.parse(conditions);
-            }
-            // Check if conditions are a string (i.e., previously stringified)
-            if (typeof conditions === 'string') {
-                try {
-                    conditions = JSON.parse(conditions);  // Parse string back to an object
-                } catch (error) {
-                    console.error("Error parsing conditions:", error);
-                    conditions = [];
-                }
+                console.log("Parsed conditions:", conditions);
             }
 
+            // Ensure conditions is an array of objects
             if (!Array.isArray(conditions)) {
-                conditions = []; // If not an array, reset to empty array
+                throw new Error("Conditions must be an array of objects.");
             }
 
-            // Render conditions
-            conditions.forEach(condition => {
-                console.log("Rendering condition:", condition);
-                conditionList.append(createConditionRow(condition));
-            });
+            // Filter out non-object elements
+            // conditions = conditions.filter(item => typeof item === "object");
 
-            // Add new condition row on button click
-            $("#add-condition").on("click", function () {
-                console.log("Adding new condition row");
-                conditionList.append(createConditionRow());
-            });
-        },
-        oneditsave: function () {
-            const conditions = [];
-
-            // Gather conditions from the form
-            $("#node-input-conditions li").each(function () {
-                const property = $(this).find(".condition-property").val();
-                const operator = $(this).find(".condition-operator").val();
-                const parameter = $(this).find(".condition-parameter").val();
-
-                console.log("Saving condition:", { property, operator, parameter });
-
-                if (property && operator && parameter !== undefined) {
-                    conditions.push({ property, operator, parameter });
-                }
-            });
-
-            // Log conditions being saved
-            console.log("Conditions being saved:", conditions, "Type: ", typeof conditions);
-
-            // Save conditions as an array of objects (not serialized)
-            this.conditions = JSON.stringify(conditions);  // Don't stringify here, keep them as objects
-            parsed = true;
-
-            console.log("Node conditions after save:", this.conditions, "Type: ",typeof this.conditions);
+        } catch (error) {
+            console.error("Error processing conditions:", error);
+            conditions = []; 
         }
+
+        this.conditions = conditions; 
+        console.log("Conditions after type check:", this.conditions);
+
+        // Render conditions in the UI
+        const conditionList = $("#node-input-conditions");
+        this.conditions.forEach(condition => {
+            conditionList.append(createConditionRow(condition));
+        });
+
+        $("#add-condition").on("click", function () {
+            conditionList.append(createConditionRow());
+        });
+    },
+    oneditsave: function () {
+        const conditions = [];
+        $("#node-input-conditions li").each(function () {
+            const property = $(this).find(".condition-property").val();
+            const operator = $(this).find(".condition-operator").val();
+            const parameter = $(this).find(".condition-parameter").val();
+
+            if (property && operator && parameter !== undefined) {
+                conditions.push({ property, operator, parameter });
+            }
+        });
+
+        console.log("Conditions being saved:", conditions);
+
+        // Save directly as an array of objects
+        this.conditions = conditions;
+        console.log("Final conditions saved:", this.conditions);
+    }
     });
 
     function createConditionRow(condition = {}) {
