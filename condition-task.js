@@ -13,6 +13,7 @@ module.exports = function (RED) {
                 // Evaluate each condition
                 for (const condition of conditions) {
                     const { property, operator, parameter } = condition;
+                    console.log(`property: ${property}, operator: ${operator}, parameter: ${parameter}`);
 
                     // Retrieve the value of the property from the message payload
                     const value = RED.util.getMessageProperty(msg, `payload.${property}`);

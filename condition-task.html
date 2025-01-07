@@ -1,5 +1,10 @@
 <script type="text/javascript">
     let parsed = false;
+    let parsedData = null;
+    let savedmydata = function(data){
+        parsedData = data;
+        console.log("Data saved: ", parsedData);
+    }   
 
     RED.nodes.registerType('condition-task', {
         category: 'function',
@@ -22,27 +27,15 @@
 
         console.log("oneditprepare: Initial conditions:", conditions);
 
-        try {
-            // Attempt to parse conditions if they are a string
-            if (typeof conditions === "string") {
-                conditions = JSON.parse(conditions);
-                console.log("Parsed conditions:", conditions);
-            }
+        this.conditions = conditions; 
 
-            // Ensure conditions is an array of objects
-            if (!Array.isArray(conditions)) {
-                throw new Error("Conditions must be an array of objects.");
-            }
+        if(parsed){
+            console.log("This is saved data", parsedData);
+            this.conditions = JSON.parse(parsedData);
+            console.log("This is parsed data", this.conditions);
 
-            // Filter out non-object elements
-            // conditions = conditions.filter(item => typeof item === "object");
-
-        } catch (error) {
-            console.error("Error processing conditions:", error);
-            conditions = []; 
         }
 
-        this.conditions = conditions; 
         console.log("Conditions after type check:", this.conditions);
 
         // Render conditions in the UI
@@ -70,8 +63,10 @@
         console.log("Conditions being saved:", conditions);
 
         // Save directly as an array of objects
-        this.conditions = conditions;
+        this.conditions = JSON.stringify(conditions);
         console.log("Final conditions saved:", this.conditions);
+        parsed = true;
+        savedmydata(this.conditions);
     }
     });
 
