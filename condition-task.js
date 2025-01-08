@@ -3,17 +3,36 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, config);
 
         const node = this;
-        const conditions = config.conditions || []; // Retrieve the conditions array
+
+        // Parse conditions if they are a string
+        let conditions = [];
+        try {
+            conditions = typeof config.conditions === "string" 
+                ? JSON.parse(config.conditions) 
+                : config.conditions || [];
+        } catch (err) {
+            node.error(`Failed to parse conditions: ${err.message}`);
+            return;
+        }
+
+        // Handle empty or invalid conditions
+        if (!Array.isArray(conditions) || conditions.length === 0) {
+            node.error("No valid conditions provided.");
+            return;
+        }
 
         node.on("input", function (msg) {
             try {
                 let allConditionsMet = true;
                 let anyConditionMatched = false;
 
+                console.log("Evaluating conditions:", conditions);
+
                 // Evaluate each condition
                 for (const condition of conditions) {
+                    console.log("Each Condition:", ...condition);
                     const { property, operator, parameter } = condition;
-                    console.log(`property: ${property}, operator: ${operator}, parameter: ${parameter}`);
+                    console.log(property, operator, parameter);
 
                     // Retrieve the value of the property from the message payload
                     const value = RED.util.getMessageProperty(msg, `payload.${property}`);
