@@ -1,20 +1,23 @@
 <script type="text/javascript">
     let parsed = false;
     let parsedData = null;
+
+    // Function to save parsed data
     let savedmydata = function(data){
         parsedData = data;
         console.log("Data saved: ", parsedData);
-    }   
+    }
 
     RED.nodes.registerType('condition-task', {
-        category: 'function',
+        category: 'common',
         color: '#a6bbcf',
         defaults: {
             name: { value: "" },
             conditions: { value: [
                 { property: 'name', operator: '==', parameter: 'John' },
                 { property: 'age', operator: '==', parameter: '30' }
-            ] }
+            ] },
+            temp :  { value: [] }
         },
         inputs: 1,
         outputs: 3,
@@ -22,54 +25,60 @@
         label: function () {
             return this.name || "condition-task";
         },
+
+        // Prepare the node editor and handle condition data
         oneditprepare: function () {
-        let conditions = this.conditions;
+            let conditions = this.conditions;
+            console.log("oneditprepare: Initial conditions:", conditions);
 
-        console.log("oneditprepare: Initial conditions:", conditions);
-
-        this.conditions = conditions; 
-
-        if(parsed){
-            console.log("This is saved data", parsedData);
-            this.conditions = JSON.parse(parsedData);
-            console.log("This is parsed data", this.conditions);
-            parsed = false;
-        }
-
-        console.log("Conditions after type check:", this.conditions);
-
-        // Render conditions in the UI
-        const conditionList = $("#node-input-conditions");
-        this.conditions.forEach(condition => {
-            conditionList.append(createConditionRow(condition));
-        });
-
-        $("#add-condition").on("click", function () {
-            conditionList.append(createConditionRow());
-        });
-    },
-    oneditsave: function () {
-        const conditions = [];
-        $("#node-input-conditions li").each(function () {
-            const property = $(this).find(".condition-property").val();
-            const operator = $(this).find(".condition-operator").val();
-            const parameter = $(this).find(".condition-parameter").val();
-
-            if (property && operator && parameter !== undefined) {
-                conditions.push({ property, operator, parameter });
+            // If parsed data exists, use it
+            if (parsed) {
+                console.log("This is saved data", parsedData);
+                this.conditions = parsedData;  // Assign saved data to conditions
+                console.log("This is parsed data", this.conditions);
+                parsed = false;
             }
-        });
 
-        console.log("Conditions being saved:", conditions);
+            // Render conditions in the UI
+            const conditionList = $("#node-input-conditions");
+            this.conditions.forEach(condition => {
+                conditionList.append(createConditionRow(condition));
+            });
 
-        // Save directly as an array of objects
-        this.conditions = JSON.stringify(conditions);
-        console.log("Final conditions saved:", this.conditions);
-        parsed = true;
-        savedmydata(this.conditions);
-    }
+            // Add condition on button click
+            $("#add-condition").on("click", function () {
+                conditionList.append(createConditionRow());
+            });
+        },
+
+        // Save the conditions when the user clicks "Done"
+        oneditsave: function () {
+            let node = this;
+            const conditions = [];
+            
+            // Iterate through each condition row and collect data
+            $("#node-input-conditions li").each(function () {
+                const property = $(this).find(".condition-property").val();
+                const operator = $(this).find(".condition-operator").val();
+                const parameter = $(this).find(".condition-parameter").val();
+
+                // Ensure valid values before saving
+                if (property && operator && parameter !== undefined) {
+                    conditions.push({ property, operator, parameter });
+                }
+            });
+
+            console.log("Conditions being saved:", conditions);
+            node.conditions = conditions; // Save the conditions as an array of objects
+            this.temp = conditions;
+            console.log("Final conditions saved:", node.conditions);
+
+            parsed = true;
+            savedmydata(node.conditions); // Save the final conditions data
+        }
     });
 
+    // Function to create the HTML row for a condition
     function createConditionRow(condition = {}) {
         const { property = "name", operator = "==", parameter = "" } = condition;
 
@@ -92,7 +101,6 @@
 
         // Handle removing a condition
         row.find(".remove-condition").on("click", function () {
-            console.log("Removing condition row:", row);
             row.remove();
         });
 

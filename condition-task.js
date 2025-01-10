@@ -4,22 +4,29 @@ module.exports = function (RED) {
 
         const node = this;
 
-        // Parse conditions if they are a string
-        let conditions = [];
-        try {
-            conditions = typeof config.conditions === "string" 
-                ? JSON.parse(config.conditions) 
-                : config.conditions || [];
-        } catch (err) {
-            node.error(`Failed to parse conditions: ${err.message}`);
-            return;
-        }
+        const conditions = config.conditions || [];
+        const temp = config.temp || [];
 
-        // Handle empty or invalid conditions
-        if (!Array.isArray(conditions) || conditions.length === 0) {
-            node.error("No valid conditions provided.");
-            return;
-        }
+        console.log("Conditions:", conditions);
+        console.log("Conditions Temp:", temp);
+
+
+        // Parse conditions if they are a string
+        // let conditions = [];
+        // try {
+        //     conditions = typeof config.conditions === "string" 
+        //         ? JSON.parse(config.conditions) 
+        //         : config.conditions || [];
+        // } catch (err) {
+        //     node.error(`Failed to parse conditions: ${err.message}`);
+        //     return;
+        // }
+
+        // // Handle empty or invalid conditions
+        // if (!Array.isArray(conditions) || conditions.length === 0) {
+        //     node.error("No valid conditions provided.");
+        //     return;
+        // }
 
         node.on("input", function (msg) {
             try {
@@ -29,8 +36,34 @@ module.exports = function (RED) {
                 console.log("Evaluating conditions:", conditions);
 
                 // Evaluate each condition
-                for (const condition of conditions) {
-                    console.log("Each Condition:", ...condition);
+                for (const condition of temp) {
+                    if (typeof condition === "string" && condition.length > 0) {
+                        console.log("Condition part:", condition[0]);
+                        console.log("Condition:", condition);
+                        console.log(JSON.stringify(condition).toString())
+                        console.log("Condition after stringify:", condition);
+                        try {
+                            console.log("Condition part:", condition[0], condition.val());
+                            console.log("Condition:", condition);
+                            console.log(JSON.stringify(condition).toString())
+                            console.log("Condition after stringify:", condition);
+                            // condition = JSON.parse(condition).toString(); // Parse if it's a string
+                        } catch (err) {
+                            node.error("Failed to parse condition:", err);
+                            continue;
+                        }
+                    }
+                    else{
+                        if(condition.length === 0)
+                        {
+                        console.log("Condition has 0 length:", condition);
+                        }
+                        else{
+                            console.log("Condition is not a string:", condition);
+                        }
+                    }
+                    console.log("Each Condition:", condition);
+
                     const { property, operator, parameter } = condition;
                     console.log(property, operator, parameter);
 
