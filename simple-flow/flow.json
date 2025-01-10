@@ -1,0 +1,158 @@
+[
+    {
+        "id": "6e607c0feea6cf24",
+        "type": "inject",
+        "z": "fba3708023c57cee",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"name\":\"Nasir\", \"age\":\"30\"}",
+        "payloadType": "json",
+        "x": 150,
+        "y": 1240,
+        "wires": [
+            [
+                "d41099840fe9e143"
+            ]
+        ]
+    },
+    {
+        "id": "d78792c8b778a6e6",
+        "type": "debug",
+        "z": "fba3708023c57cee",
+        "name": "ALL TRUE",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "ebb573cf5592ccd5",
+        "type": "debug",
+        "z": "fba3708023c57cee",
+        "name": "ONE TRUE",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 650,
+        "y": 1240,
+        "wires": []
+    },
+    {
+        "id": "acb5b44432549650",
+        "type": "debug",
+        "z": "fba3708023c57cee",
+        "name": "FALSE",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 640,
+        "y": 1300,
+        "wires": []
+    },
+    {
+        "id": "d41099840fe9e143",
+        "type": "simple-task",
+        "z": "fba3708023c57cee",
+        "name": "Conditional Node",
+        "operatorName": "==",
+        "parameterName": "Nasir",
+        "operatorAge": "!=",
+        "parameterAge": "30",
+        "x": 310,
+        "y": 1240,
+        "wires": [
+            [
+                "d0f7b53827ec3188"
+            ],
+            [
+                "804a48dea6d3143d"
+            ],
+            [
+                "1179c958bb72a1a2"
+            ]
+        ]
+    },
+    {
+        "id": "d0f7b53827ec3188",
+        "type": "template",
+        "z": "fba3708023c57cee",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "plain",
+        "template": "All Condition match: Name: {{payload.name}}, Age: {{payload.age}}",
+        "output": "str",
+        "x": 500,
+        "y": 1120,
+        "wires": [
+            [
+                "d78792c8b778a6e6"
+            ]
+        ]
+    },
+    {
+        "id": "804a48dea6d3143d",
+        "type": "template",
+        "z": "fba3708023c57cee",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "Only one condition match: Name: {{payload.name}}, Age: {{payload.age}}",
+        "output": "str",
+        "x": 500,
+        "y": 1240,
+        "wires": [
+            [
+                "ebb573cf5592ccd5"
+            ]
+        ]
+    },
+    {
+        "id": "1179c958bb72a1a2",
+        "type": "template",
+        "z": "fba3708023c57cee",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "NO condition match:Name: {{payload.name}}, Age: {{payload.age}}",
+        "output": "str",
+        "x": 500,
+        "y": 1340,
+        "wires": [
+            [
+                "acb5b44432549650"
+            ]
+        ]
+    }
+]

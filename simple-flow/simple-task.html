@@ -1,0 +1,70 @@
+<script type="text/javascript">
+    RED.nodes.registerType('simple-task', {
+        category: 'function',
+        color: '#a6bbcf',
+        defaults: {
+            name: { value: "" },
+            operatorName: { value: "==" },
+            parameterName: { value: "" },
+            operatorAge: { value: "==" },
+            parameterAge: { value: "" },
+        },
+        inputs: 1,
+        outputs: 3,
+        icon: "file.svg",
+        label: function () {
+            return this.name || "simple-task";
+        },
+        oneditprepare: function () {
+            // Populate inputs with saved values for both conditions
+            $("#node-input-operator-name").val(this.operatorName || "==");
+            $("#node-input-parameter-name").val(this.parameterName || "");
+            $("#node-input-operator-age").val(this.operatorAge || "==");
+            $("#node-input-parameter-age").val(this.parameterAge || "");
+        },
+        oneditsave: function () {
+            // Save the values for both conditions
+            this.operatorName = $("#node-input-operator-name").val();
+            this.parameterName = $("#node-input-parameter-name").val();
+            this.operatorAge = $("#node-input-operator-age").val();
+            this.parameterAge = $("#node-input-parameter-age").val();
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="simple-task">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label><i class="fa fa-cog"></i> Condition for "name"</label>
+        <select id="node-input-operator-name" style="width: 30%;">
+            <option value="==">==</option>
+            <option value="!=">&ne;</option>
+        </select>
+        <input type="text" id="node-input-parameter-name" placeholder="Parameter for name" style="width: 60%;">
+    </div>
+    <div class="form-row">
+        <label><i class="fa fa-cog"></i> Condition for "age"</label>
+        <select id="node-input-operator-age" style="width: 30%;">
+            <option value="==">==</option>
+            <option value="!=">&ne;</option>
+        </select>
+        <input type="text" id="node-input-parameter-age" placeholder="Parameter for age" style="width: 60%;">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="simple-task">
+    <p>This node evaluates two conditions:</p>
+    <ul>
+        <li>Condition 1: Property "name" with user-defined operator and parameter.</li>
+        <li>Condition 2: Property "age" with user-defined operator and parameter.</li>
+    </ul>
+    <p>The node has the following outputs:</p>
+    <ul>
+        <li>Output 1: If all conditions are met.</li>
+        <li>Output 2: If any condition is met.</li>
+        <li>Output 3: If no condition is met.</li>
+    </ul>
+</script>
