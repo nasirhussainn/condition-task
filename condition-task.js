@@ -17,35 +17,6 @@ module.exports = function (RED) {
 
                 // Evaluate each condition
                 for (const condition of conditions) {
-                    if (typeof condition === "string" && condition.length > 0) {
-                        console.log("Condition part:", condition[0]);
-                        console.log("Condition:", condition);
-                        console.log(JSON.stringify(condition).toString())
-                        console.log("Condition after stringify:", condition);
-                        try {
-                            console.log("Condition part:", condition[0], condition.val());
-                            console.log("Condition:", condition);
-                            console.log(JSON.stringify(condition).toString())
-                            console.log("Condition after stringify:", condition);
-                            // condition = JSON.parse(condition).toString(); // Parse if it's a string
-                        } catch (err) {
-                            node.error("Failed to parse condition:", err);
-                            continue;
-                        }
-                    }
-                    else{
-                        if(condition.length === 0)
-                        {
-                        console.log("Condition has 0 length:", condition);
-                        }
-                        else{
-                            console.log("Condition is not a string:", condition);
-                        }
-                    }
-                    console.log("Each Condition:", condition);
-
-                    const { property, operator, parameter } = condition;
-                    console.log(property, operator, parameter);
 
                     // Retrieve the value of the property from the message payload
                     const value = RED.util.getMessageProperty(msg, `payload.${property}`);
