@@ -1,133 +1,81 @@
+<script type="text/html" data-template-name="condition-task">
+    <div class="form-row">
+        <label for="node-input-name">Name</label>
+        <input type="text" id="node-input-name" placeholder="Enter node name" />
+    </div>
+    <div class="form-row">
+        <label for="node-input-items"><i class="fa fa-list"></i> Editable List</label>
+        <ol class="list"></ol>
+    </div>
+</script>
+
 <script type="text/javascript">
-    let parsed = false;
-    let parsedData = null;
-
-    // Function to save parsed data
-    let savedmydata = function(data){
-        parsedData = data;
-        console.log("Data saved: ", parsedData);
-    }
-
     RED.nodes.registerType('condition-task', {
         category: 'common',
         color: '#a6bbcf',
         defaults: {
             name: { value: "" },
-            conditions: { value: [
-                { property: 'name', operator: '==', parameter: 'John' },
-                { property: 'age', operator: '==', parameter: '30' }
-            ] },
-            temp :  { value: [] }
+            items: { value: [] } 
         },
         inputs: 1,
         outputs: 3,
         icon: "file.svg",
         label: function () {
-            return this.name || "condition-task";
+            return this.name || "Conditional Node";
         },
-
-        // Prepare the node editor and handle condition data
         oneditprepare: function () {
-            let conditions = this.conditions;
-            console.log("oneditprepare: Initial conditions:", conditions);
+            const itemsList = $("ol.list");
 
-            // If parsed data exists, use it
-            if (parsed) {
-                console.log("This is saved data", parsedData);
-                this.conditions = parsedData;  // Assign saved data to conditions
-                console.log("This is parsed data", this.conditions);
-                parsed = false;
-            }
+            itemsList.editableList({
+                addButton: true,
+                removable: true,
+                sortable: true,
+                addItem: function (row, index, data) {
+                    const propertyDropdown = $('<select class="condition-property"/>')
+                        .append('<option value="name">Name</option>')
+                        .append('<option value="age">Age</option>')
+                        .val(data.property || "name")
+                        .on("change", function () {
+                            data.property = $(this).val();
+                        })
+                        .appendTo(row);
 
-            // Render conditions in the UI
-            const conditionList = $("#node-input-conditions");
-            this.conditions.forEach(condition => {
-                conditionList.append(createConditionRow(condition));
-            });
+                    const operatorDropdown = $('<select class="condition-operator"/>')
+                        .append('<option value="==">==</option>')
+                        .append('<option value="!=">!=</option>')
+                        .val(data.operator || "==")
+                        .on("change", function () {
+                            data.operator = $(this).val();
+                        })
+                        .appendTo(row);
 
-            // Add condition on button click
-            $("#add-condition").on("click", function () {
-                conditionList.append(createConditionRow());
-            });
-        },
-
-        // Save the conditions when the user clicks "Done"
-        oneditsave: function () {
-            let node = this;
-            const conditions = [];
-            
-            // Iterate through each condition row and collect data
-            $("#node-input-conditions li").each(function () {
-                const property = $(this).find(".condition-property").val();
-                const operator = $(this).find(".condition-operator").val();
-                const parameter = $(this).find(".condition-parameter").val();
-
-                // Ensure valid values before saving
-                if (property && operator && parameter !== undefined) {
-                    conditions.push({ property, operator, parameter });
+                    const parameterInput = $('<input type="text" class="condition-parameter" placeholder="Enter parameter"/>')
+                        .val(data.parameter || "")
+                        .on("change", function () {
+                            data.parameter = $(this).val();
+                        })
+                        .appendTo(row);
                 }
             });
 
-            console.log("Conditions being saved:", conditions);
-            node.conditions = conditions; // Save the conditions as an array of objects
-            this.temp = conditions;
-            console.log("Final conditions saved:", node.conditions);
+            const items = this.items || [];
+            items.forEach((item) => {
+                itemsList.editableList("addItem", item);
+            });
+        },
+        oneditsave: function () {
+            const items = [];
 
-            parsed = true;
-            savedmydata(node.conditions); // Save the final conditions data
+            $("ol.list").editableList("items").each(function (index, element) {
+                const property = $(element).find(".condition-property").val();
+                const operator = $(element).find(".condition-operator").val();
+                const parameter = $(element).find(".condition-parameter").val();
+
+                items.push({ property, operator, parameter });
+            });
+
+            this.items = items;
+            console.log("Saved conditions:", this.items); 
         }
     });
-
-    // Function to create the HTML row for a condition
-    function createConditionRow(condition = {}) {
-        const { property = "name", operator = "==", parameter = "" } = condition;
-
-        console.log("Creating condition row for:", { property, operator, parameter });
-
-        const row = $(`
-            <li style="margin-bottom: 5px;">
-                <select class="condition-property" style="width: 30%;">
-                    <option value="name" ${property === "name" ? "selected" : ""}>name</option>
-                    <option value="age" ${property === "age" ? "selected" : ""}>age</option>
-                </select>
-                <select class="condition-operator" style="width: 20%;">
-                    <option value="==" ${operator === "==" ? "selected" : ""}>==</option>
-                    <option value="!=" ${operator === "!=" ? "selected" : ""}>&ne;</option>
-                </select>
-                <input type="text" class="condition-parameter" placeholder="Parameter" style="width: 30%;" value="${parameter}">
-                <button class="remove-condition red-ui-button red-ui-button-small"><i class="fa fa-trash"></i></button>
-            </li>
-        `);
-
-        // Handle removing a condition
-        row.find(".remove-condition").on("click", function () {
-            row.remove();
-        });
-
-        return row;
-    }
-</script>
-
-<script type="text/html" data-template-name="condition-task">
-    <div class="form-row">
-        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-    <div class="form-row">
-        <label><i class="fa fa-list"></i> Conditions</label>
-        <ol id="node-input-conditions" style="list-style: none; padding: 0;">
-        </ol>
-        <button id="add-condition" class="red-ui-button red-ui-button-small">
-            <i class="fa fa-plus"></i> Add Condition
-        </button>
-    </div>
-</script>
-
-<script type="text/html" data-help-name="condition-task">
-    <p>This node allows you to define multiple conditions. Messages are routed:</p>
-    <ul>
-        <li>Output 1: If all conditions are met</li>
-        <li>Output 2: If any condition is met</li>
-        <li>Output 3: If no conditions are met</li>
-    </ul>
 </script>

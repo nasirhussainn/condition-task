@@ -4,29 +4,9 @@ module.exports = function (RED) {
 
         const node = this;
 
-        const conditions = config.conditions || [];
-        const temp = config.temp || [];
+        const conditions = config.items || [];
 
         console.log("Conditions:", conditions);
-        console.log("Conditions Temp:", temp);
-
-
-        // Parse conditions if they are a string
-        // let conditions = [];
-        // try {
-        //     conditions = typeof config.conditions === "string" 
-        //         ? JSON.parse(config.conditions) 
-        //         : config.conditions || [];
-        // } catch (err) {
-        //     node.error(`Failed to parse conditions: ${err.message}`);
-        //     return;
-        // }
-
-        // // Handle empty or invalid conditions
-        // if (!Array.isArray(conditions) || conditions.length === 0) {
-        //     node.error("No valid conditions provided.");
-        //     return;
-        // }
 
         node.on("input", function (msg) {
             try {
@@ -36,7 +16,7 @@ module.exports = function (RED) {
                 console.log("Evaluating conditions:", conditions);
 
                 // Evaluate each condition
-                for (const condition of temp) {
+                for (const condition of conditions) {
                     if (typeof condition === "string" && condition.length > 0) {
                         console.log("Condition part:", condition[0]);
                         console.log("Condition:", condition);

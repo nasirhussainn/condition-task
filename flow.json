@@ -14,48 +14,13 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "payload": "{\"name\":\"nasir\",\"age\":\"360\"}",
+        "payload": "{\"name\":\"qammar\",\"age\":\"13\"}",
         "payloadType": "json",
         "x": 110,
         "y": 200,
         "wires": [
             [
-                "91b25479d801593e"
-            ]
-        ]
-    },
-    {
-        "id": "91b25479d801593e",
-        "type": "condition-task",
-        "z": "19f4a1d7164b8cc4",
-        "name": "",
-        "conditions": [
-            "[object Object]",
-            "[object Object]"
-        ],
-        "temp": [
-            {
-                "property": "age",
-                "operator": "==",
-                "parameter": "16"
-            },
-            {
-                "property": "name",
-                "operator": "==",
-                "parameter": "haider"
-            }
-        ],
-        "x": 340,
-        "y": 200,
-        "wires": [
-            [
-                "ee24e0b6e9bf1247"
-            ],
-            [
-                "05ca677cb17ead68"
-            ],
-            [
-                "243cf28eb8de3de1"
+                "02e8a788485a1671"
             ]
         ]
     },
@@ -106,8 +71,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 660,
-        "y": 240,
+        "x": 680,
+        "y": 260,
         "wires": []
     },
     {
@@ -119,7 +84,7 @@
         "fieldType": "msg",
         "format": "handlebars",
         "syntax": "mustache",
-        "template": "Only one condition match: Name: {{payload.name}}, Age: {{payload.age}}",
+        "template": "At least one condition match: Name: {{payload.name}}, Age: {{payload.age}}",
         "output": "str",
         "x": 520,
         "y": 200,
@@ -164,6 +129,37 @@
         "wires": [
             [
                 "8573519a639a772b"
+            ]
+        ]
+    },
+    {
+        "id": "02e8a788485a1671",
+        "type": "condition-task",
+        "z": "19f4a1d7164b8cc4",
+        "name": "conds",
+        "items": [
+            {
+                "property": "name",
+                "operator": "==",
+                "parameter": "qammar"
+            },
+            {
+                "property": "age",
+                "operator": "==",
+                "parameter": "13"
+            }
+        ],
+        "x": 250,
+        "y": 200,
+        "wires": [
+            [
+                "ee24e0b6e9bf1247"
+            ],
+            [
+                "05ca677cb17ead68"
+            ],
+            [
+                "243cf28eb8de3de1"
             ]
         ]
     }
